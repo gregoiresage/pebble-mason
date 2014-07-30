@@ -133,8 +133,8 @@ int main(void) {
   time_t now = time(NULL);
   struct tm *tick_time = localtime(&now);
 
-  handle_minute_tick(tick_time, SECOND_UNIT);
-  tick_timer_service_subscribe(SECOND_UNIT, handle_minute_tick);
+  handle_minute_tick(tick_time, MINUTE_UNIT);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   bluetooth_connection_service_subscribe(bluetooth_connection_handler);
 
   bluetooth_connected = bluetooth_connection_service_peek();
