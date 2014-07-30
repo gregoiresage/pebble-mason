@@ -1,0 +1,26 @@
+{
+  "uuid": "60ad1929-74a2-46f1-8ae6-1d8ceef964c6",
+  "shortName": "Mason",
+  "longName": "Mason",
+  "companyName": "Sean Kelly",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [{
+        "type": "png",
+        "name": "IMAGE_PATTERN",
+        "file": "images/pattern.png"
+      },
+      {
+        "type": "font",
+        "name": "FONT_UNSTEADY_OVERSTEER_22",
+        "file": "fonts/unsteady_oversteer/unsteady_oversteer.ttf"
+      }]
+  }
+}
