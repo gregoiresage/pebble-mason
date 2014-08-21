@@ -3,10 +3,16 @@
   "shortName": "Mason",
   "longName": "Mason",
   "companyName": "Sean Kelly",
-  "versionCode": 2,
-  "versionLabel": "1.0.1",
+  "versionCode": 3,
+  "versionLabel": "1.1.0",
   "watchapp": {
     "watchface": true
+  },
+  "capabilities": [
+    "configurable"
+  ],
+  "appKeys": {
+    "inverted": 0
   },
   "resources": {
     "media": [{
@@ -19,5 +25,20 @@
         "name": "FONT_UNSTEADY_OVERSTEER_22",
         "file": "fonts/unsteady_oversteer/unsteady_oversteer.ttf"
       }]
+  },
+  "preferences": {
+    "embedded": true,
+    "debug": false,
+    "description": "",
+    "items": [
+      {
+        "name": "inverted",
+        "title": "Inverted",
+        "type": "boolean",
+        "off-text": "Off",
+        "on-text": "On",
+        "default": false
+      }
+    ]
   }
 }

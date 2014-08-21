@@ -1,9 +1,11 @@
 #include <pebble.h>
 
+#include "autoconfig.h"
 #include "drawarc.h"
 
 static Window *window;
 static Layer *layer;
+static InverterLayer *inverter_layer;
 
 static GBitmap *image;
 static GFont custom_font;
@@ -21,6 +23,14 @@ static GPoint center;
 #define DOT_RADIUS 6
 
 static bool bluetooth_connected = false;
+
+static void in_received_handler(DictionaryIterator *iter, void *context) {
+  // Let Pebble Autoconfig handle received settings
+  autoconfig_in_received_handler(iter, context);
+
+  // Update display with new values
+  layer_set_hidden(inverter_layer_get_layer(inverter_layer), !getInverted());
+}
 
 static void update_layer_callback(Layer *layer, GContext* ctx) {
   GRect bounds = layer_get_frame(layer);
@@ -115,6 +125,10 @@ void bluetooth_connection_handler(bool connected){
 
 
 int main(void) {
+  autoconfig_init();
+
+  app_message_register_inbox_received(in_received_handler);
+
   center = GPoint(72, 74);
 
   window = window_create();
@@ -126,6 +140,10 @@ int main(void) {
   layer = layer_create(bounds);
   layer_set_update_proc(layer, update_layer_callback);
   layer_add_child(window_layer, layer);
+
+  inverter_layer = inverter_layer_create(bounds);
+  layer_set_hidden(inverter_layer_get_layer(inverter_layer), !getInverted());
+  layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
 
   custom_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_UNSTEADY_OVERSTEER_22));
   image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_PATTERN);
@@ -142,9 +160,12 @@ int main(void) {
   app_event_loop();
 
   layer_destroy(layer);
+  inverter_layer_destroy(inverter_layer);
   window_destroy(window);
   gbitmap_destroy(image);
   fonts_unload_custom_font(custom_font);
   tick_timer_service_unsubscribe();
   bluetooth_connection_service_unsubscribe();
+
+  autoconfig_deinit();
 }
