@@ -3,8 +3,8 @@
   "shortName": "Mason",
   "longName": "Mason",
   "companyName": "Sean Kelly",
-  "versionCode": 3,
-  "versionLabel": "1.1",
+  "versionCode": 4,
+  "versionLabel": "1.2",
   "watchapp": {
     "watchface": true
   },
