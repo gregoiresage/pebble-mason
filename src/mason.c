@@ -9,7 +9,7 @@ static InverterLayer *inverter_layer;
 
 static GBitmap *image;
 static GFont custom_font;
-static char *days[7] = {"SUN","MON","TUE","WED","TUE","FRI","SAT"};
+static char *days[7] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
 
 static uint8_t hours = 0;
 static uint8_t minutes = 0;
