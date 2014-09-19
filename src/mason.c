@@ -24,6 +24,13 @@ static GPoint center;
 
 static bool bluetooth_connected = false;
 
+static AppTimer *timerDots;
+
+static void timer_callback(void *data) {
+  timerDots = NULL;
+  layer_mark_dirty(layer);
+}
+
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   // Let Pebble Autoconfig handle received settings
   autoconfig_in_received_handler(iter, context);
@@ -66,8 +73,23 @@ static void update_layer_callback(Layer *layer, GContext* ctx) {
   graphics_draw_pixel(ctx, GPoint(center.x-1, center.y - OUTER_RADIUS + 2)); // round end effect
   graphics_draw_pixel(ctx, GPoint(center.x-1, center.y - OUTER_RADIUS + 3)); // round end effect
 
-  // Draw hour dot
   GPoint hourDot;
+
+  // draw hours dots if needed
+  if(timerDots){
+    for(int i=0; i<12; i++){
+      hours_angle = TRIG_MAX_ANGLE * i / 12;
+      hourDot.y = (int16_t)(-cos_lookup(hours_angle) * (OUTER_RADIUS - OUTER_THICKNESS/2 - 1) / TRIG_MAX_RATIO) + center.y;
+      hourDot.x = (int16_t)(sin_lookup(hours_angle) * (OUTER_RADIUS - OUTER_THICKNESS/2 - 1) / TRIG_MAX_RATIO) + center.x;
+      graphics_context_set_fill_color(ctx, GColorWhite);
+      graphics_fill_circle(ctx, hourDot, DOT_RADIUS - 2);
+    }
+  
+    graphics_context_set_stroke_color(ctx, GColorBlack);
+    graphics_draw_arc(ctx, center, OUTER_RADIUS + 5, 5, 0, 360);
+  }
+
+  // Draw hour dot
   hours_angle = TRIG_MAX_ANGLE * ((hours % 12) * 60 + minutes) / (12 * 60);
   hourDot.y = (int16_t)(-cos_lookup(hours_angle) * (OUTER_RADIUS - OUTER_THICKNESS/2) / TRIG_MAX_RATIO) + center.y;
   hourDot.x = (int16_t)(sin_lookup(hours_angle) * (OUTER_RADIUS - OUTER_THICKNESS/2) / TRIG_MAX_RATIO) + center.x;
@@ -123,6 +145,12 @@ void bluetooth_connection_handler(bool connected){
   }
 }
 
+static void accel_tap_handler(AccelAxisType axis, int32_t direction){
+  if(!timerDots){
+    timerDots = app_timer_register(3000, timer_callback, NULL);
+    layer_mark_dirty(layer);
+  }
+}
 
 int main(void) {
   autoconfig_init();
@@ -154,6 +182,7 @@ int main(void) {
   handle_minute_tick(tick_time, MINUTE_UNIT);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   bluetooth_connection_service_subscribe(bluetooth_connection_handler);
+  accel_tap_service_subscribe(accel_tap_handler);
 
   bluetooth_connected = bluetooth_connection_service_peek();
 
@@ -166,6 +195,11 @@ int main(void) {
   fonts_unload_custom_font(custom_font);
   tick_timer_service_unsubscribe();
   bluetooth_connection_service_unsubscribe();
+  accel_tap_service_unsubscribe();
+
+  if(!timerDots){
+    app_timer_cancel(timerDots);
+  }
 
   autoconfig_deinit();
 }
